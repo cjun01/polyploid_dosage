@@ -14,7 +14,7 @@ Ensure you have Python installed on your machine and import the necessary comb f
   Tetraploid:
   0:AAAA, 1:AAAB, 2:AABB, 3:ABBB, 4:BBBB 
   
-  Hexaploid:
+  •	Hexaploid Probabilities:
   0:AAAAAA, 1:AAAAAB, 2:AAAABB, 3:AAABBB, 4:AABBBB, 5:ABBBBB, 6:BBBBBB
   •	Binomial Probability: An internal function binomial_probability calculates the binomial probability using the formula:
   ![formula](https://latex.codecogs.com/gif.latex?P%28X=k%29%20%3D%20%5Cbinom%7Bn%7D%7Bk%7D%20p%5Ek%20%281-p%29%5E%7Bn-k%7D)
