@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="tetraploid_dosage", "hexaploid_dosage.py"
+    name="tetraploid_dosage"
     version="0.0.1",
     packages=find_packages(),
     install_requires=[
