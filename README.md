@@ -1,6 +1,6 @@
 **INSTALL**
 
-pip install git+https://github.com/cjun01/tetraploid_dosage.git
+pip install git+https://github.com/cjun01/polyploid_dosage.git
 
 1. Introduction:
 The calculate_probabilities function takes in two integers a and b, representing the number of reads of type 'A' and 'B' respectively. It then calculates the binomial probability for various dosage scenarios and prints out the results.
