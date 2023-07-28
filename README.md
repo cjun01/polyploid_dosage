@@ -44,8 +44,12 @@ or **from hexaploid_dosage import calculate_probabilities**
 
 
 a, b = 1, 100
-calculate_probabilities(a, b)
-The function will then print out the probabilities for all dosage categories.
+
+probabilities = calculate_probabilities(a, b)
+
+The output is returned and save in probabilities.
+
+The function will also print out the probabilities for all dosage categories.
 
 Expected Output:
 
