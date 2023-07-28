@@ -1,4 +1,4 @@
-INSTALL
+INSTALL:
 pip install git+https://github.com/cjun01/tetraploid_dosage.git
 
 
