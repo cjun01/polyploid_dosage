@@ -3,7 +3,7 @@
 pip install git+https://github.com/cjun01/polyploid_dosage.git
 
 1. Introduction:
-The calculate_probabilities function takes in two integers a and b, representing the number of reads of type 'A' and 'B' respectively. It then calculates the binomial probability for various dosage scenarios and prints out the results.
+The calculate_probabilities function takes in two integers a and b, representing the reference call and alternative call respectively. It then calculates the binomial probability for various dosage scenarios and prints out the results.
 
 2. Setting up:
 Ensure you have Python installed on your machine and import the necessary comb function from the math module.
