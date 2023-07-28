@@ -26,7 +26,7 @@ def calculate_probabilities(a, b):
     if a == 0:
         return {0: 1}
     if b == 0:
-        return {6: 0}
+        return {6: 1}
     else:
         # Compute probabilities for each scenario
         probs = {}
