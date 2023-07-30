@@ -5,11 +5,11 @@ def calculate_probabilities(a, b):
     # 0:AAAA, 1:AAAB,2:AABB,3:ABBB,4:BBBB
     e=0.001
     p_values = {
-        0: 1-e,  # Placeholder value, modify as necessary
+        0: 1-e,  
         1: 3 / 4+e,
         2: 2 / 4+e,
         3: 1 / 4+e,
-        4: 0+e  # Placeholder value, modify as necessary
+        4: 0+e  
     }
 
     # Calculate binomial probability
