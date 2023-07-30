@@ -2,14 +2,15 @@ from math import comb
 def calculate_probabilities(a, b):
     # Probabilities from heuristic
     #Ref dosage 0:aaaaaa, 1:aaaaab, 2:aaaabb, 3:aaabbb, 4:aabbbb, 5:abbbbb, 6:bbbbbb
+    e=0.001
     p_values = {
-        0: 1,  # Placeholder value, modify as necessary
-        1: 5/6,
-        2: 4/6,
-        3: 3/6,
-        4: 2/6,
-        5: 1/6,
-        6: 0  # Placeholder value, modify as necessary
+        0: 1-e,  
+        1: 5/6+e,
+        2: 4/6+e,
+        3: 3/6+e,
+        4: 2/6+e,
+        5: 1/6+e,
+        6: 0+e  
     }
 
 
@@ -23,10 +24,6 @@ def calculate_probabilities(a, b):
     if a == 0 and b == 0:
         print("No reads.")
         return None
-    if a == 0:
-        return {0: 1}
-    if b == 0:
-        return {6: 1}
     else:
         # Compute probabilities for each scenario
         probs = {}
@@ -53,7 +50,8 @@ def calculate_probabilities(a, b):
     # Print the probabilities for all dosage categories
     for dosage, prob in probabilities.items():
         print(f"Dosage = {dosage}: Probability = {prob:.4f}")
-    return probabilities
 
 
 
+a,b=1,50
+calculate_probabilities(a,b)
