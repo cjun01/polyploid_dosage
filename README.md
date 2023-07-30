@@ -1,3 +1,6 @@
+This program refers to Yamamoto et al. (2020) https://academic.oup.com/g3journal/article/10/8/2661/6048639#235941658.
+
+
 **INSTALL**
 
 pip install git+https://github.com/cjun01/polyploid_dosage.git
