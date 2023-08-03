@@ -47,6 +47,3 @@ def calculate_probabilities(a, b):
         print(f"Dosage = {dosage}: Probability = {prob:.4f}")
 
     return probabilities
-
-a,b=30,1
-calculate_probabilities(a,b)
