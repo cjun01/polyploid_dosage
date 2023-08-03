@@ -50,8 +50,5 @@ def calculate_probabilities(a, b):
     # Print the probabilities for all dosage categories
     for dosage, prob in probabilities.items():
         print(f"Dosage = {dosage}: Probability = {prob:.4f}")
-
-
-
-a,b=1,50
-calculate_probabilities(a,b)
+    
+    return probabilities
