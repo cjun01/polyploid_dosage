@@ -1,15 +1,12 @@
-import random
-from math import comb
 import matplotlib.pyplot as plt
+from math import comb
 
 ###############################################################################
-# ORIGINAL calculate_probabilities FUNCTION (UNMODIFIED)
+# ORIGINAL FUNCTION: calculate_probabilities (unchanged)
 ###############################################################################
 def calculate_probabilities(a, b):
-    """
-    Original function: unchanged. Prints out probabilities for each dosage.
-    0:AAAA, 1:AAAB, 2:AABB, 3:ABBB, 4:BBBB
-    """
+    # Probabilities from heuristic
+    # 0:AAAA, 1:AAAB, 2:AABB, 3:ABBB, 4:BBBB
     e = 0.001
     p_values = {
         0: 1 - e,       # AAAA
@@ -23,7 +20,6 @@ def calculate_probabilities(a, b):
         return comb(n, k) * (p ** k) * ((1 - p) ** (n - k))
 
     n = a + b
-
     if a == 0 and b == 0:
         print("No reads.")
         return
@@ -31,7 +27,6 @@ def calculate_probabilities(a, b):
     probs = {}
     for dosage, p in p_values.items():
         val = binomial_probability(n, a, p)
-        # Basic safety checks (though typically unnecessary):
         if val > 1:
             val = 0
         if val < 0:
@@ -45,95 +40,95 @@ def calculate_probabilities(a, b):
 
     probabilities = {k: v / total_prob for k, v in probs.items()}
 
+    # Print out the probabilities for all dosage categories
     for dosage, prob in probabilities.items():
         print(f"Dosage = {dosage}: Probability = {prob:.4f}")
 
     return probabilities
 
 ###############################################################################
-# SIMULATION FUNCTIONS
+# SIMULATION PARAMETERS AND READ GENERATION
 ###############################################################################
-def simulate_one_genotype(true_dosage, coverage, e=0.001, num_reps=100):
-    """
-    For a given true dosage (0..4) and coverage (e.g., 10x),
-    generate 'num_reps' sets of (ref_reads, alt_reads), each time
-    calling 'calculate_probabilities' to see what dosage is inferred.
+# Define ideal fractions for read generation without error:
+# For genotype:
+#   0 (AAAA): 1.0 (100% A, 0% B)
+#   1 (AAAB): 0.75 (75% A, 25% B)
+#   2 (AABB): 0.50 (50% A, 50% B)
+#   3 (ABBB): 0.25 (25% A, 75% B)
+# We omit genotype 4 (BBBB) because it is symmetric to AAAA.
+ideal_fractions = {
+    0: 1.0,   # AAAA (represents both AAAA and BBBB)
+    1: 0.75,  # AAAB
+    2: 0.50,  # AABB
+    3: 0.25   # ABBB
+}
 
-    The simulated data *does* incorporate an error rate 'e':
-      p_Ref = fraction_of_A_in_genotype*(1-e) + (1 - fraction_of_A_in_genotype)*e
-    Example: AAAA has fraction_of_A_in_genotype = 1.0
-             so p_Ref = 1.0*(1-e) + (0.0)*e = 1-e
-    This ensures AAAA can still yield a small % of alternate reads.
-    """
-    # fraction_of_A_in_genotype: AAAA=1.0, AAAB=0.75, AABB=0.50, ABBB=0.25, BBBB=0.0
-    fraction_map = {
-        0: 1.0,   # AAAA
-        1: 0.75,  # AAAB
-        2: 0.50,  # AABB
-        3: 0.25,  # ABBB
-        4: 0.0    # BBBB
-    }
-    frac_A = fraction_map[true_dosage]
+# We'll simulate for these four genotype cases.
+genotypes_to_simulate = [0, 1, 2, 3]
 
-    # Effective proportion of reference reads, incorporating error:
-    p_ref = frac_A * (1 - e) + (1 - frac_A) * e
+# Read depth (coverage) range: 1x to 100x
+coverages = list(range(1, 101))
 
-    correct_calls = 0
+# Dictionary to store the inferred probability (from calculate_probabilities)
+# for each genotype at each coverage.
+# Format: probability_results[genotype] = [prob_at_depth1, prob_at_depth2, ..., prob_at_depth100]
+probability_results = {geno: [] for geno in genotypes_to_simulate}
 
-    for _ in range(num_reps):
-        # Simulate the number of reference reads out of 'coverage'
-        # with probability p_ref
-        ref_reads = sum(random.random() < p_ref for _ in range(coverage))
-        alt_reads = coverage - ref_reads
+###############################################################################
+# SIMULATION LOOP: For each read depth and for each genotype,
+# generate ideal read counts and compute the inferred probability.
+###############################################################################
+for depth in coverages:
+    for geno in genotypes_to_simulate:
+        frac_A = ideal_fractions[geno]
+        # Generate perfect read counts:
+        # For example, for AAAB (geno 1) at a depth of 20, we aim for 75% A.
+        ref_reads = int(round(depth * frac_A))
+        alt_reads = depth - ref_reads
 
-        # Call the original function
+        # Call the original function (which applies the post-treatment error e=0.001)
         probs = calculate_probabilities(ref_reads, alt_reads)
         if probs is None:
-            continue
+            probability_results[geno].append(0)
+        else:
+            # Record the probability assigned to the true genotype (geno)
+            probability_results[geno].append(probs.get(geno, 0))
 
-        # Best call = dosage with highest posterior probability
-        best_call = max(probs, key=probs.get)
-        if best_call == true_dosage:
-            correct_calls += 1
+###############################################################################
+# DETERMINE THE MINIMUM COVERAGE WHERE EACH GENOTYPE HAS >= 99% INFERRED PROBABILITY
+###############################################################################
+# We want the minimum coverage at which, for all simulated genotypes, the inferred probability is at least 0.99.
+threshold_coverage = None
+for i, depth in enumerate(coverages):
+    # Check if all four genotypes have probability >= 0.99 at this coverage
+    if all(probability_results[geno][i] >= 0.99 for geno in genotypes_to_simulate):
+        threshold_coverage = depth
+        break
 
-    return correct_calls / num_reps if num_reps > 0 else 0.0
+###############################################################################
+# COMPOSITE PLOT: Plot the Inferred Probability vs. Coverage for Each Genotype
+###############################################################################
+plt.figure(figsize=(10, 6))
+genotype_labels = {
+    0: "AAAA (extreme)",  # representing AAAA and BBBB
+    1: "AAAB",
+    2: "AABB",
+    3: "ABBB"
+}
 
-def main():
-    # Coverage from 1x to 100x
-    coverages = range(1, 101)
-    num_reps = 20  # Fewer reps to reduce console spam; increase as needed
-    error_rate = 0.001
+for geno in genotypes_to_simulate:
+    plt.plot(coverages, probability_results[geno], marker='o', label=genotype_labels[geno])
 
-    # Store accuracy results for each genotype:
-    #   accuracy[dosage] = [acc_at_cov_1, acc_at_cov_2, ..., acc_at_cov_100]
-    accuracy = {g: [] for g in range(5)}
+# Mark the threshold coverage with a vertical line if found.
+if threshold_coverage is not None:
+    plt.axvline(x=threshold_coverage, color='red', linestyle='--',
+                label=f"Threshold: {threshold_coverage}x (all ≥99%)")
 
-    # Run simulations
-    for cov in coverages:
-        print(f"\n=== Coverage: {cov}x ===")
-        for true_dosage in range(5):
-            frac_correct = simulate_one_genotype(
-                true_dosage, coverage=cov, e=error_rate, num_reps=num_reps
-            )
-            accuracy[true_dosage].append(frac_correct)
-            print(f"  True Dosage={true_dosage}, Accuracy={frac_correct:.3f}")
-
-    # Plot the results
-    plt.figure(figsize=(10, 6))
-    dosage_labels = {0: "AAAA", 1: "AAAB", 2: "AABB", 3: "ABBB", 4: "BBBB"}
-    for g in range(5):
-        plt.plot(coverages, accuracy[g], label=dosage_labels[g])
-
-    plt.title("Accuracy of Dosage Calls (1–100x) with Error in Simulation")
-    plt.xlabel("Coverage")
-    plt.ylabel("Fraction of Correct Calls")
-    plt.ylim(0, 1.05)
-    plt.legend()
-    plt.grid(True)
-    
-    # Save the plot to PNG at 600 dpi
-    plt.savefig("dosage_accuracy.png", dpi=600)
-    plt.show()
-
-if __name__ == "__main__":
-    main()
+plt.xlabel("Coverage (read depth)")
+plt.ylabel("Inferred Probability of True Genotype")
+plt.title("Inferred Genotype Probability vs. Coverage")
+plt.ylim(0, 1.05)
+plt.legend()
+plt.grid(True)
+plt.savefig("dosage_accuracy.png", dpi=600)
+plt.show()
