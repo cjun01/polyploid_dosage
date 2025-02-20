@@ -110,7 +110,7 @@ for i, depth in enumerate(coverages):
 ###############################################################################
 plt.figure(figsize=(10, 6))
 genotype_labels = {
-    0: "AAAA (extreme)",  # representing AAAA and BBBB
+    0: "AAAA/BBBB",  # representing AAAA and BBBB
     1: "AAAB",
     2: "AABB",
     3: "ABBB"
@@ -130,5 +130,6 @@ plt.title("Inferred Genotype Probability vs. Coverage")
 plt.ylim(0, 1.05)
 plt.legend()
 plt.grid(True)
-plt.savefig("dosage_accuracy.png", dpi=600)
+plt.savefig(r"C:\Users\CFLZXC\OneDrive - Plant and Food Research\potato\potato_bioinformatics\results\ready\haplotype\dosage_accuracy.png", dpi=600)
+
 plt.show()
